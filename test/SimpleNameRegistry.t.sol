@@ -19,6 +19,9 @@ abstract contract StateZero is Test {
     event RegisterName(address indexed registrant, string indexed name);
     event RevokeName(address indexed registrant, string indexed name);
 
+    error AlreadyRegistered();
+    error NotOwner();
+
     function setUp() public virtual {
         registry = new SimpleNameRegistry();
         alice = address(0x1);
@@ -41,6 +44,12 @@ contract StateZeroTest is StateZero {
         emit RegisterName(alice, name1);
         vm.prank(alice);
         registry.registerName(name1);
+    }
+
+    function testRevokeFailsWithError() public {
+        vm.expectRevert(NotOwner.selector);
+        vm.prank(alice);
+        registry.revokeName(name1);
     }
 }
 
