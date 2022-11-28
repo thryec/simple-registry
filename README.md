@@ -1,5 +1,7 @@
 # Simple Name Registry
 
+https://github.com/yieldprotocol/mentorship2022/issues/1
+
 ### Objectives
 
 1. Users (identified by an address) can claim a name, which is recorded on-chain.
@@ -12,11 +14,13 @@
 `registerName()`
 
 - accepts string to register as input parameter
-- check for string equality with existing registered names by hashing the input
-- stores the user's address together with the hash of the input string
+- check that string has not been previously registered, else an error is thrown
+- stores the name and the associated user's address in a mapping
+- emits a RegisterName event
 
-`releaseName()`
+`revokeName()`
 
 - accepts string to release as input parameter
-- check that user has registered this name previously
+- check that user is the owner of this name
 - reset the storage location of this name to zero
+- emits a RevokeName event
