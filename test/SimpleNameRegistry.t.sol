@@ -15,6 +15,7 @@ abstract contract StateZero is Test {
 
     string name1 = "hello";
     string name2 = "world";
+    string name3 = "apple";
 
     event RegisterName(address indexed registrant, string indexed name);
     event RevokeName(address indexed registrant, string indexed name);
@@ -59,5 +60,35 @@ abstract contract StateOne is StateZero {
 
         vm.prank(alice);
         registry.registerName(name1);
+    }
+}
+
+contract StateOneTest is StateOne {
+    function testAddingSecondName() public {
+        vm.prank(alice);
+        registry.registerName(name2);
+        address registeredHolder = registry.registry(name2);
+        assertEq(registeredHolder, alice);
+    }
+
+    function testRevokingName() public {
+        vm.prank(alice);
+        registry.revokeName(name1);
+        address registeredHolder = registry.registry(name1);
+        assertEq(registeredHolder, address(0));
+    }
+
+    function testRevokingNameEmitsEvent() public {
+        vm.expectEmit(true, true, true, true);
+        emit RevokeName(alice, name1);
+        vm.prank(alice);
+        registry.revokeName(name1);
+    }
+
+    function testSecondUserAddName() public {
+        vm.prank(bob);
+        registry.registerName(name3);
+        address registeredHolder = registry.registry(name3);
+        assertEq(registeredHolder, bob);
     }
 }
