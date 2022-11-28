@@ -6,19 +6,49 @@ import "forge-std/console2.sol";
 import "../src/SimpleNameRegistry.sol";
 import {Vm} from "forge-std/Vm.sol";
 
+// vm deployer address: 0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84
+
 abstract contract StateZero is Test {
-    SimpleNameRegistry public simpleNameRegistry;
+    SimpleNameRegistry public registry;
+    address alice;
+    address bob;
+
     string name1 = "hello";
     string name2 = "world";
 
+    event RegisterName(address indexed registrant, string indexed name);
+    event RevokeName(address indexed registrant, string indexed name);
+
     function setUp() public virtual {
-        simpleNameRegistry = new SimpleNameRegistry();
+        registry = new SimpleNameRegistry();
+        alice = address(0x1);
+        bob = address(0x2);
+        vm.label(alice, "alice");
+        vm.label(bob, "bob");
     }
 }
 
 contract StateZeroTest is StateZero {
     function testRegister() public {
-        bytes32 registeredName = simpleNameRegistry.registerName(name1);
-        console2.logBytes32(registeredName);
+        vm.prank(alice);
+        registry.registerName(name1);
+        address registeredHolder = registry.registry(name1);
+        assertEq(registeredHolder, alice);
+    }
+
+    function testRegisterEmitsEvent() public {
+        vm.expectEmit(true, true, true, true);
+        emit RegisterName(alice, name1);
+        vm.prank(alice);
+        registry.registerName(name1);
+    }
+}
+
+abstract contract StateOne is StateZero {
+    function setUp() public virtual override {
+        super.setUp();
+
+        vm.prank(alice);
+        registry.registerName(name1);
     }
 }
