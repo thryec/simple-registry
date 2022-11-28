@@ -2,22 +2,23 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../src/Counter.sol";
+import "forge-std/console2.sol";
+import "../src/SimpleNameRegistry.sol";
+import {Vm} from "forge-std/Vm.sol";
 
-contract CounterTest is Test {
-    Counter public counter;
-    function setUp() public {
-       counter = new Counter();
-       counter.setNumber(0);
+abstract contract StateZero is Test {
+    SimpleNameRegistry public simpleNameRegistry;
+    string name1 = "hello";
+    string name2 = "world";
+
+    function setUp() public virtual {
+        simpleNameRegistry = new SimpleNameRegistry();
     }
+}
 
-    function testIncrement() public {
-        counter.increment();
-        assertEq(counter.number(), 1);
-    }
-
-    function testSetNumber(uint256 x) public {
-        counter.setNumber(x);
-        assertEq(counter.number(), x);
+contract StateZeroTest is StateZero {
+    function testRegister() public {
+        bytes32 registeredName = simpleNameRegistry.registerName(name1);
+        console2.logBytes32(registeredName);
     }
 }
